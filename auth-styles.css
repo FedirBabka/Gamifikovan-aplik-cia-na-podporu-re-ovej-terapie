@@ -1,0 +1,348 @@
+/* ============================================
+   СТИЛИ ДЛЯ СИСТЕМЫ АВТОРИЗАЦИИ
+   ============================================ */
+
+/* МОДАЛЬНОЕ ОКНО АВТОРИЗАЦИИ */
+.auth-modal {
+    display: none; /* По умолчанию скрыто */
+    position: fixed;
+    z-index: 3000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s ease;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Активное состояние - явно показываем */
+.auth-modal.active {
+    display: flex !important;
+}
+
+/* КОНТЕНТ МОДАЛЬНОГО ОКНА */
+.auth-modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 30px;
+    max-width: 450px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    position: relative;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* КНОПКА ЗАКРЫТИЯ */
+.auth-close {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    font-size: 35px;
+    font-weight: bold;
+    color: #999;
+    cursor: pointer;
+    transition: color 0.3s;
+    line-height: 1;
+}
+
+.auth-close:hover {
+    color: #333;
+}
+
+/* ЗАГОЛОВОК */
+.auth-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-logo {
+    font-size: 4em;
+    margin-bottom: 15px;
+}
+
+.auth-header h2 {
+    color: #667eea;
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.auth-header p {
+    color: #666;
+    font-size: 1em;
+}
+
+/* ГРУППА ИНПУТОВ */
+.auth-input-group {
+    margin-bottom: 20px;
+}
+
+.auth-input-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+.auth-input-group input {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 15px;
+    font-size: 1em;
+    transition: all 0.3s;
+    outline: none;
+}
+
+.auth-input-group input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.auth-input-group input::placeholder {
+    color: #999;
+}
+
+/* СООБЩЕНИЕ ОБ ОШИБКЕ */
+.auth-error {
+    background: #fee;
+    color: #c33;
+    padding: 12px 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: none;
+    font-size: 0.9em;
+    border: 1px solid #fcc;
+}
+
+.auth-error.show {
+    display: block;
+    animation: shake 0.3s ease;
+}
+
+/* КНОПКА ОТПРАВКИ */
+.auth-button {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.auth-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.auth-button:active {
+    transform: translateY(0);
+}
+
+.auth-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* СПИННЕР ЗАГРУЗКИ */
+.auth-spinner {
+    display: inline-block;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ПЕРЕКЛЮЧЕНИЕ МЕЖДУ ФОРМАМИ */
+.auth-switch {
+    text-align: center;
+    margin-top: 25px;
+    color: #666;
+    font-size: 0.95em;
+}
+
+.auth-switch a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+.auth-switch a:hover {
+    color: #5568d3;
+    text-decoration: underline;
+}
+
+/* ============================================
+   ПАНЕЛЬ ПОЛЬЗОВАТЕЛЯ (ПОСЛЕ ВХОДА)
+   ============================================ */
+
+.user-panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 15px 20px;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    z-index: 1000;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-weight: bold;
+    color: #333;
+    font-size: 1em;
+}
+
+.user-email {
+    font-size: 0.85em;
+    color: #666;
+}
+
+.user-logout-btn {
+    padding: 8px 16px;
+    background: #f44336;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.3s;
+}
+
+.user-logout-btn:hover {
+    background: #d32f2f;
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   КНОПКА ВХОДА (КОГДА НЕ АВТОРИЗОВАН)
+   ============================================ */
+
+.auth-trigger {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.auth-trigger-btn {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.auth-trigger-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* ============================================
+   АДАПТИВНОСТЬ ДЛЯ МОБИЛЬНЫХ
+   ============================================ */
+
+@media (max-width: 768px) {
+    .auth-modal-content {
+        padding: 30px 20px;
+        max-width: 95%;
+    }
+
+    .auth-header h2 {
+        font-size: 1.5em;
+    }
+
+    .user-panel {
+        top: 10px;
+        right: 10px;
+        padding: 10px 15px;
+    }
+
+    .user-avatar {
+        width: 35px;
+        height: 35px;
+        font-size: 1.2em;
+    }
+
+    .user-name {
+        font-size: 0.9em;
+    }
+
+    .user-email {
+        font-size: 0.75em;
+    }
+
+    .auth-trigger {
+        top: 10px;
+        right: 10px;
+    }
+
+    .auth-trigger-btn {
+        padding: 10px 20px;
+        font-size: 0.9em;
+    }
+}

@@ -1,0 +1,464 @@
+/* ============================================
+   ZÁKLADNÉ ŠTÝLY PRE CELÚ APLIKÁCIU
+   ============================================ */
+
+/* Reset všetkých štandardných margin a padding hodnôt */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* Zahŕňa padding a border do šírky elementu */
+}
+
+/* ŠTÝLY PRE CELÚ STRÁNKU (BODY) */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Fialový gradient pozadie */
+    min-height: 100vh; /* Minimálna výška = celá obrazovka */
+    display: flex; /* Flexbox pre centrovanie */
+    justify-content: center; /* Horizontálne centrovanie */
+    align-items: center; /* Vertikálne centrovanie */
+    padding: 20px;
+}
+
+/* HLAVNÝ KONTAJNER APLIKÁCIE */
+.container {
+    background: white;
+    border-radius: 30px; /* Zaoblené rohy */
+    padding: 40px;
+    max-width: 800px; /* Maximálna šírka */
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3); /* Tieň pre 3D efekt */
+    position: relative;
+    overflow: hidden; /* Skrýva obsah mimo kontajnera */
+}
+
+/* ============================================
+   SEKCIA HLAVIČKY
+   ============================================ */
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Logo emoji */
+.logo {
+    font-size: 3em;
+    margin-bottom: 10px;
+}
+
+/* Hlavný nadpis aplikácie */
+h1 {
+    color: #667eea; /* Fialová farba */
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+/* Podnadpis pod hlavným názvom */
+.subtitle {
+    color: #666; /* Tmavošedá */
+    font-size: 1.1em;
+}
+
+/* ============================================
+   PANEL SO ŠTATISTIKAMI (Úroveň, Body, Séria)
+   ============================================ */
+
+.stats-bar {
+    display: flex;
+    justify-content: space-around; /* Rovnomerné rozloženie */
+    margin-bottom: 30px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); /* Ružový gradient */
+    border-radius: 20px;
+    color: white;
+}
+
+/* Jednotlivá štatistika */
+.stat {
+    text-align: center;
+}
+
+/* Číselná hodnota štatistiky (napr. "5", "100") */
+.stat-value {
+    font-size: 2em;
+    font-weight: bold;
+    display: block;
+}
+
+/* Popis štatistiky (napr. "Body", "Úroveň") */
+.stat-label {
+    font-size: 0.9em;
+    opacity: 0.9; /* Mierne priehľadné */
+}
+
+/* ============================================
+   KARTY S VÝBEROM ÚROVNÍ
+   ============================================ */
+
+/* Grid layout pre karty úrovní */
+.level-select {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responzívny grid */
+    gap: 20px; /* Medzera medzi kartami */
+    margin-bottom: 30px;
+}
+
+/* JEDNA KARTA ÚROVNE */
+.level-card {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); /* Modrý gradient */
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    cursor: pointer; /* Kurzor ukazuje že je to klikateľné */
+    transition: all 0.3s ease; /* Plynulé prechody */
+    border: 3px solid transparent;
+    position: relative; /* Pre absolútne pozíciu zámku */
+}
+
+/* Hover efekt na karte (keď na ňu najedeme myšou) */
+.level-card:hover {
+    transform: translateY(-10px); /* Vyskočí o 10px hore */
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+}
+
+/* ZAMKNUTÁ ÚROVEŇ */
+.level-card.locked {
+    background: #ccc; /* Sivé pozadie */
+    cursor: not-allowed; /* Kurzor ukazuje že nie je klikateľné */
+    opacity: 0.6; /* Priehľadnejšie */
+}
+
+/* AKTÍVNA (VYBRANÁ) ÚROVEŇ */
+.level-card.active {
+    border-color: #667eea; /* Fialový border */
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.5); /* Žiara okolo */
+}
+
+/* Ikona úrovne (emoji) */
+.level-icon {
+    font-size: 3em;
+    margin-bottom: 10px;
+}
+
+/* Názov úrovne (napr. "Ľahká") */
+.level-title {
+    color: white;
+    font-size: 1.3em;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* Popis úrovne (napr. "Jednoduché slová") */
+.level-description {
+    color: rgba(255,255,255,0.9);
+    font-size: 0.9em;
+}
+
+/* Ikona zámku v rohu karty */
+.lock-icon {
+    position: absolute; /* Absolútne pozícionovanie */
+    top: 10px;
+    right: 10px;
+    font-size: 1.5em;
+}
+
+/* ============================================
+   SEKCIA S CVIČENIAMI
+   ============================================ */
+
+/* Kontajner celej sekcie cvičení */
+.exercise-area {
+    display: none; /* Skryté na začiatku - zobrazí sa po výbere úrovne */
+    animation: fadeIn 0.5s ease; /* Animácia pri zobrazení */
+}
+
+/* Animácia postupného zjavenia */
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(20px); /* Začne o 20px nižšie */
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); /* Posunie sa na normálnu pozíciu */
+    }
+}
+
+/* KARTA S CVIČENÍM */
+.exercise-card {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); /* Ružovo-žltý gradient */
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* SLOVO NA PRECVIČENIE */
+/* Toto je najdôležitejšia časť - slovo ktoré má dieťa vysloviť */
+.exercise-word {
+    font-size: 4em; /* Veľké písmo pre lepšiu viditeľnosť */
+    font-weight: bold;
+    color: white;
+    margin: 20px 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2); /* Tieň textu */
+}
+
+/* Inštrukcia nad slovom */
+.exercise-instruction {
+    font-size: 1.3em;
+    color: white;
+    margin-bottom: 20px;
+}
+
+/* ============================================
+   TLAČIDLO MIKROFÓNU
+   ============================================ */
+
+.voice-button {
+    background: #667eea; /* Fialové pozadie */
+    color: white;
+    border: none;
+    padding: 20px 40px;
+    font-size: 1.3em;
+    border-radius: 50px; /* Zaoblené ako pilulka */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px; /* Medzera medzi ikonou a textom */
+}
+
+/* Hover efekt na tlačidle */
+.voice-button:hover {
+    background: #5568d3; /* Tmavšia fialová */
+    transform: scale(1.05); /* Mierne zväčšenie */
+}
+
+/* Efekt pri kliknutí */
+.voice-button:active {
+    transform: scale(0.95); /* Mierne zmenšenie */
+}
+
+/* STAV KEĎ MIKROFÓN POČÚVA */
+/* Tento stav sa aktivuje keď je Web Speech API aktívne */
+.voice-button.listening {
+    background: #f5576c; /* Červené pozadie = nahrávam */
+    animation: pulse 1.5s infinite; /* Pulzujúca animácia */
+}
+
+/* Pulzujúca animácia počas nahrávania */
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); } /* V polovici sa zväčší */
+}
+
+/* ============================================
+   PANEL S FEEDBACKOM (Správna/Nesprávna odpoveď)
+   ============================================ */
+
+.feedback {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 15px;
+    font-size: 1.2em;
+    font-weight: bold;
+    display: none; /* Skryté, kým sa nezobrazí feedback */
+}
+
+/* SPRÁVNA ODPOVEĎ - zelený panel */
+.feedback.correct {
+    background: #4caf50; /* Zelená farba */
+    color: white;
+    display: block;
+    animation: bounceIn 0.5s ease; /* Odskočenie */
+}
+
+/* NESPRÁVNA ODPOVEĎ - červený panel */
+.feedback.incorrect {
+    background: #f44336; /* Červená farba */
+    color: white;
+    display: block;
+    animation: shake 0.5s ease; /* Zatrasenie */
+}
+
+/* Animácia odskočenia pri správnej odpovedi */
+@keyframes bounceIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Animácia zatrasenia pri nesprávnej odpovedi */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+/* ============================================
+   PROGRESS BAR (ukazuje pokrok v úrovni)
+   ============================================ */
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background: #e0e0e0; /* Sivé pozadie */
+    border-radius: 10px;
+    overflow: hidden; /* Skrýva obsah mimo */
+    margin-bottom: 20px;
+}
+
+/* Vyplnená časť progress baru */
+/* Šírka sa mení dynamicky cez JavaScript podľa počtu dokončených cvičení */
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); /* Fialový gradient */
+    transition: width 0.5s ease; /* Plynulý prechod pri zmene šírky */
+}
+
+/* ============================================
+   NAVIGAČNÉ TLAČIDLÁ
+   ============================================ */
+
+.navigation-buttons {
+    display: flex;
+    gap: 15px; /* Medzera medzi tlačidlami */
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* Základný štýl tlačidla */
+.btn {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Primárne tlačidlo (napr. "Ďalej") */
+.btn-primary {
+    background: #667eea; /* Fialová */
+    color: white;
+}
+
+/* Sekundárne tlačidlo (napr. "Späť") */
+.btn-secondary {
+    background: #e0e0e0; /* Sivá */
+    color: #333;
+}
+
+/* Hover efekt na tlačidlách */
+.btn:hover {
+    transform: translateY(-3px); /* Vyskočí hore */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* ============================================
+   KONFETY - ANIMÁCIA PRI ÚSPECHU
+   ============================================ */
+
+/* Kontajner na konfety - prekrýva celú obrazovku */
+.celebration {
+    position: fixed; /* Fixné pozícionovanie na obrazovke */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Neprekáža klikaniu */
+    z-index: 1000; /* Nad všetkým ostatným */
+}
+
+/* Jedna konfeta */
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #f0f; /* Farba sa mení v JavaScript */
+    animation: confetti-fall 3s ease-out forwards; /* Animácia padania */
+}
+
+/* Animácia padania konfiet */
+@keyframes confetti-fall {
+    0% { 
+        transform: translateY(-100px) rotate(0deg); /* Začne nad obrazovkou */
+        opacity: 1;
+    }
+    100% { 
+        transform: translateY(100vh) rotate(720deg); /* Spadne dole a rotuje */
+        opacity: 0; /* Zmizne */
+    }
+}
+
+/* ============================================
+   MODÁLNE OKNO PO DOKONČENÍ ÚROVNE
+   ============================================ */
+
+/* Pozadie modálneho okna - tmavý overlay */
+.modal {
+    display: none; /* Skryté, kým sa nezobrazia */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7); /* Polotransparentné čierne pozadie */
+    justify-content: center;
+    align-items: center;
+    z-index: 2000; /* Nad konfetami */
+}
+
+/* Samotný obsah modálneho okna */
+.modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 30px;
+    text-align: center;
+    max-width: 500px;
+    animation: bounceIn 0.5s ease; /* Odskočenie pri zobrazení */
+}
+
+/* Ikona v modálnom okne (emoji) */
+.modal-icon {
+    font-size: 5em;
+    margin-bottom: 20px;
+}
+
+/* Nadpis modálneho okna */
+.modal-title {
+    font-size: 2em;
+    color: #667eea;
+    margin-bottom: 15px;
+}
+
+/* Text v modálnom okne */
+.modal-text {
+    font-size: 1.2em;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN - MOBILY A TABLETY
+   ============================================ */
+
+/* Úpravy pre menšie obrazovky (mobily) */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px; /* Menší padding */
+    }
+
+    h1 {
+        font-size: 1.5em; /* Menší nadpis */
+    }
+
+    .level-select {
+        grid-template-columns: 1fr; /* Jedna karta pod druhou */
+    }
+
+    .exercise-word {
+        font-size: 2.5em; /* Menšie slová */
+    }
+}

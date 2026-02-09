@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reč Hrdina - Gamifikovaná aplikácia na podporu rečovej terapie</title>
+    
+    <!-- Pripojenie CSS súboru so všetkými štýlmi -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Pripojenie CSS súboru pre autentifikáciu -->
+    <link rel="stylesheet" href="auth-styles.css">
+    
+    <!-- ============================================
+         FIREBASE SDK - БАЗА ДАННЫХ И АВТОРИЗАЦИЯ
+         ============================================ -->
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <!-- Firebase Authentication -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <!-- Firebase Realtime Database -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+    <!-- HLAVNÝ KONTAJNER APLIKÁCIE -->
+    <div class="container">
+        
+        <!-- SEKCIA HLAVIČKY S LOGOM A NÁZVOM -->
+        <div class="header">
+            <div class="logo">🦸‍♂️</div>
+            <h1>Reč Hrdina</h1>
+            <p class="subtitle">Gamifikovaná aplikácia na podporu rečovej terapie</p>
+        </div>
+
+        <!-- PANEL SO ŠTATISTIKAMI (Úroveň, Body, Séria) -->
+        <!-- Tieto hodnoty sa aktualizujú dynamicky cez JavaScript -->
+        <div class="stats-bar">
+            <!-- Aktuálna úroveň hráča -->
+            <div class="stat">
+                <span class="stat-value" id="level-display">1</span>
+                <span class="stat-label">Úroveň</span>
+            </div>
+            
+            <!-- Celkové skóre hráča -->
+            <div class="stat">
+                <span class="stat-value" id="score-display">0</span>
+                <span class="stat-label">Body</span>
+            </div>
+            
+            <!-- Počet správnych odpovedí za sebou (streak) -->
+            <div class="stat">
+                <span class="stat-value" id="streak-display">0</span>
+                <span class="stat-label">Séria</span>
+            </div>
+        </div>
+
+        <!-- SEKCIA VÝBERU ÚROVNE OBTIAŽNOSTI -->
+        <!-- Táto sekcia je viditeľná na začiatku, po kliknutí na úroveň sa skryje -->
+        <div id="level-selection">
+            <h2 style="text-align: center; margin-bottom: 20px; color: #667eea;">Vyber si úroveň obtiažnosti</h2>
+            
+            <!-- GRID S KARTAMI ÚROVNÍ -->
+            <div class="level-select">
+                
+                <!-- ĽAHKÁ ÚROVEŇ - odomknutá na začiatku (trieda "active") -->
+                <div class="level-card active" data-level="easy">
+                    <div class="level-icon">🌱</div>
+                    <div class="level-title">Ľahká</div>
+                    <div class="level-description">Jednoduché slová a zvuky</div>
+                </div>
+                
+                <!-- STREDNÁ ÚROVEŇ - zamknutá na začiatku (trieda "locked") -->
+                <!-- Odomkne sa po dokončení ľahkej úrovne s 70%+ úspešnosťou -->
+                <div class="level-card locked" data-level="medium">
+                    <div class="level-icon">⭐</div>
+                    <div class="level-title">Stredná</div>
+                    <div class="level-description">Zložitejšie slová</div>
+                    <div class="lock-icon">🔒</div>
+                </div>
+                
+                <!-- ŤAŽKÁ ÚROVEŇ - zamknutá na začiatku -->
+                <!-- Odomkne sa po dokončení strednej úrovne s 70%+ úspešnosťou -->
+                <div class="level-card locked" data-level="hard">
+                    <div class="level-icon">💎</div>
+                    <div class="level-title">Ťažká</div>
+                    <div class="level-description">Náročné frázy</div>
+                    <div class="lock-icon">🔒</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEKCIA S CVIČENIAMI -->
+        <!-- Táto sekcia je skrytá na začiatku (display: none v CSS) -->
+        <!-- Zobrazí sa po výbere úrovne obtiažnosti -->
+        <div class="exercise-area" id="exercise-area">
+            
+            <!-- PROGRESS BAR - ukazuje koľko cvičení je hotových -->
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+
+            <!-- KARTA S CVIČENÍM -->
+            <div class="exercise-card">
+                <!-- Inštrukcia čo má používateľ urobiť -->
+                <div class="exercise-instruction" id="instruction">Povedz toto slovo nahlas:</div>
+                
+                <!-- SLOVO ktoré má používateľ vysloviť -->
+                <!-- Toto sa mení dynamicky v JavaScript -->
+                <div class="exercise-word" id="word-display">🎤</div>
+                
+                <!-- TLAČIDLO MIKROFÓNU -->
+                <!-- Po kliknutí sa aktivuje Web Speech API a začne počúvať -->
+                <button class="voice-button" id="voice-btn">
+                    <span>🎤</span>
+                    <span>Stlač a hovor</span>
+                </button>
+            </div>
+
+            <!-- FEEDBACK PANEL -->
+            <!-- Zobrazuje sa po vyhodnotení odpovede -->
+            <!-- Môže byť zelený (správne) alebo červený (nesprávne) -->
+            <div class="feedback" id="feedback"></div>
+
+            <!-- NAVIGAČNÉ TLAČIDLÁ -->
+            <div class="navigation-buttons">
+                <!-- Tlačidlo späť na výber úrovne -->
+                <button class="btn btn-secondary" id="back-btn">↩ Späť</button>
+                
+                <!-- Tlačidlo na ďalšie cvičenie (zobrazí sa len po správnej odpovedi) -->
+                <button class="btn btn-primary" id="next-btn" style="display: none;">Ďalej →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- КОНТАЈНЕР НА KONFETY -->
+    <!-- Sem sa pridávajú animované konfety pri úspechu -->
+    <div class="celebration" id="celebration"></div>
+
+    <!-- MODÁLNE OKNO PO DOKONČENÍ ÚROVNE -->
+    <!-- Zobrazuje sa keď používateľ dokončí všetky cvičenia v úrovni -->
+    <div class="modal" id="level-complete-modal">
+        <div class="modal-content">
+            <div class="modal-icon">🎉</div>
+            <div class="modal-title">Úroveň dokončená!</div>
+            <!-- Dynamický text s bodmi a úspešnosťou -->
+            <div class="modal-text" id="modal-text">Získal si <strong>100 bodov</strong>!</div>
+            <button class="btn btn-primary" id="continue-btn">Pokračovať</button>
+        </div>
+    </div>
+
+    <!-- ============================================
+         МОДАЛЬНЫЕ ОКНА АВТОРИЗАЦИИ
+         ============================================ -->
+
+    <!-- МОДАЛЬНОЕ ОКНО ВХОДА (упрощенное) -->
+    <div class="auth-modal" id="login-modal" style="display: none;">
+        <div class="auth-modal-content">
+            <span class="auth-close" onclick="closeModal('login-modal')">&times;</span>
+            
+            <div class="auth-header">
+                <div class="auth-logo">🦸‍♂️</div>
+                <h2>Prihlásenie</h2>
+                <p>Prihlás sa aby si uložil svoj pokrok</p>
+            </div>
+
+            <form id="login-form">
+                <div class="auth-input-group">
+                    <label>Email</label>
+                    <input type="email" id="login-email" required>
+                </div>
+
+                <div class="auth-input-group">
+                    <label>Heslo</label>
+                    <input type="password" id="login-password" required>
+                </div>
+
+                <button type="submit" class="auth-button">Prihlásiť sa</button>
+            </form>
+
+            <div class="auth-switch">
+                Nemáš účet? 
+                <a href="#" onclick="closeModal('login-modal'); openModal('register-modal');">Zaregistruj sa</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО РЕГИСТРАЦИИ (с показом пароля) -->
+    <div class="auth-modal" id="register-modal" style="display: none;">
+        <div class="auth-modal-content">
+            <span class="auth-close" onclick="closeModal('register-modal')">&times;</span>
+            
+            <div class="auth-header">
+                <div class="auth-logo">🎉</div>
+                <h2>Registrácia</h2>
+                <p>Vytvor si účet a začni trénovať!</p>
+            </div>
+
+            <form id="register-form">
+                <div class="auth-input-group">
+                    <label>Používateľské meno</label>
+                    <input type="text" id="register-username" placeholder="Tvoje meno" minlength="3" maxlength="20" required>
+                </div>
+
+                <div class="auth-input-group">
+                    <label>Email</label>
+                    <input type="email" id="register-email" placeholder="tvoj@email.sk" required>
+                </div>
+
+                <div class="auth-input-group">
+                    <label>Heslo</label>
+                    <div style="position: relative;">
+                        <input type="password" id="register-password" placeholder="Minimálne 6 znakov" minlength="6" required style="padding-right: 45px;">
+                        <button type="button" onclick="togglePasswordVisibility('register-password', 'reg-pass-icon')" 
+                                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.2em;">
+                            <span id="reg-pass-icon">👁️</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="auth-input-group">
+                    <label>Potvrď heslo</label>
+                    <div style="position: relative;">
+                        <input type="password" id="register-password-confirm" placeholder="Znova zadaj heslo" minlength="6" required style="padding-right: 45px;">
+                        <button type="button" onclick="togglePasswordVisibility('register-password-confirm', 'reg-confirm-icon')" 
+                                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.2em;">
+                            <span id="reg-confirm-icon">👁️</span>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="auth-button">Vytvoriť účet</button>
+            </form>
+
+            <div class="auth-switch">
+                Už máš účet? 
+                <a href="#" onclick="closeModal('register-modal'); openModal('login-modal'); return false;">Prihlás sa</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ПАНЕЛЬ ПОЛЬЗОВАТЕЛЯ (простая версия) -->
+    <div class="user-panel" id="user-panel" style="display: none;">
+        <div class="user-info">
+            <div class="user-avatar">👤</div>
+            <div class="user-details">
+                <div class="user-name" id="user-name">User</div>
+                <div class="user-email" id="user-email">email@example.sk</div>
+            </div>
+        </div>
+        <button class="user-logout-btn" id="logout-btn">Odhlásiť sa</button>
+    </div>
+
+    <!-- КНОПКА ВХОДА -->
+    <div class="auth-trigger" id="auth-trigger">
+        <button class="auth-trigger-btn" onclick="openModal('login-modal')">
+            🔐 Prihlásiť sa
+        </button>
+    </div>
+
+    <!-- ПРИПOJENIE JAVASCRIPT SÚBORU -->
+    <!-- Tento súbor obsahuje všetku logiku aplikácie a Web Speech API -->
+    <script src="script.js"></script>
+    
+    <!-- ============================================
+         FIREBASE И ПРОСТАЯ АВТОРИЗАЦИЯ
+         ============================================ -->
+    <!-- Firebase konfigurácia -->
+    <script src="firebase-config.js"></script>
+    
+    <!-- НОВАЯ ПРОСТАЯ система авторизации -->
+    <script src="simple-auth.js"></script>
+</body>
+</html>

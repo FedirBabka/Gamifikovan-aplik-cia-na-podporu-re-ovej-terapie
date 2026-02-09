@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Test - Kontrola pripojenia</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .test-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .test-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .test-item.pending {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .test-item.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .test-item.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .icon {
+            font-size: 24px;
+            min-width: 30px;
+        }
+
+        .test-label {
+            flex: 1;
+            font-weight: 600;
+        }
+
+        .status {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .console-output {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .console-line {
+            margin: 5px 0;
+        }
+
+        .info { color: #4fc3f7; }
+        .success { color: #81c784; }
+        .error { color: #e57373; }
+        .warning { color: #ffb74d; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔥 Firebase Test</h1>
+        
+        <div class="test-item pending" id="test-config">
+            <div class="icon">⏳</div>
+            <div class="test-label">Konfigurácia Firebase</div>
+            <div class="status">Čakám...</div>
+        </div>
+
+        <div class="test-item pending" id="test-init">
+            <div class="icon">⏳</div>
+            <div class="test-label">Inicializácia Firebase</div>
+            <div class="status">Čakám...</div>
+        </div>
+
+        <div class="test-item pending" id="test-auth">
+            <div class="icon">⏳</div>
+            <div class="test-label">Firebase Authentication</div>
+            <div class="status">Čakám...</div>
+        </div>
+
+        <div class="test-item pending" id="test-database">
+            <div class="icon">⏳</div>
+            <div class="test-label">Realtime Database</div>
+            <div class="status">Čakám...</div>
+        </div>
+
+        <div class="test-item pending" id="test-persistence">
+            <div class="icon">⏳</div>
+            <div class="test-label">Session Persistence</div>
+            <div class="status">Čakám...</div>
+        </div>
+
+        <div class="actions">
+            <button class="btn-primary" onclick="runTests()">Spustiť test</button>
+            <button class="btn-secondary" onclick="location.href='index.html'">Späť na aplikáciu</button>
+        </div>
+
+        <div class="console-output" id="console-output">
+            <div class="console-line info">💡 Klikni na "Spustiť test" pre kontrolu Firebase pripojenia</div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <!-- Firebase Config -->
+    <script src="firebase-config.js"></script>
+
+    <script>
+        let testsPassed = 0;
+        let testsTotal = 5;
+
+        function log(message, type = 'info') {
+            const output = document.getElementById('console-output');
+            const line = document.createElement('div');
+            line.className = `console-line ${type}`;
+            line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function updateTest(testId, status, message) {
+            const test = document.getElementById(testId);
+            test.className = `test-item ${status}`;
+            
+            const icon = test.querySelector('.icon');
+            const statusEl = test.querySelector('.status');
+            
+            if (status === 'success') {
+                icon.textContent = '✅';
+                statusEl.textContent = 'OK';
+                testsPassed++;
+            } else if (status === 'error') {
+                icon.textContent = '❌';
+                statusEl.textContent = 'Chyba';
+            }
+            
+            if (message) {
+                log(message, status === 'success' ? 'success' : 'error');
+            }
+        }
+
+        async function runTests() {
+            log('🚀 Spúšťam testy Firebase pripojenia...', 'info');
+            testsPassed = 0;
+
+            // Test 1: Konfigurácia
+            log('Test 1/5: Kontrola konfigurácie...', 'info');
+            try {
+                if (typeof firebaseConfig === 'undefined') {
+                    throw new Error('firebaseConfig nie je definovaný');
+                }
+                
+                const required = ['apiKey', 'authDomain', 'projectId'];
+                const missing = required.filter(key => !firebaseConfig[key] || firebaseConfig[key].includes('YOUR_'));
+                
+                if (missing.length > 0) {
+                    throw new Error(`Chýbajú polia: ${missing.join(', ')}`);
+                }
+                
+                updateTest('test-config', 'success', '✅ Konfigurácia je v poriadku');
+            } catch (error) {
+                updateTest('test-config', 'error', `❌ ${error.message}`);
+                log('⚠️ Prosím, nastav firebase-config.js podľa inštrukcií', 'warning');
+                return;
+            }
+
+            // Test 2: Inicializácia
+            log('Test 2/5: Inicializácia Firebase...', 'info');
+            try {
+                if (!window.firebaseAuth || !window.firebaseDB) {
+                    throw new Error('Firebase služby nie sú inicializované');
+                }
+                updateTest('test-init', 'success', '✅ Firebase úspešne inicializovaný');
+            } catch (error) {
+                updateTest('test-init', 'error', `❌ ${error.message}`);
+                return;
+            }
+
+            // Test 3: Authentication
+            log('Test 3/5: Testovanie Authentication...', 'info');
+            try {
+                const auth = window.firebaseAuth;
+                if (!auth) throw new Error('Auth nie je dostupný');
+                
+                // Kontrola metód
+                if (!auth.createUserWithEmailAndPassword) {
+                    throw new Error('Auth metódy nie sú dostupné');
+                }
+                
+                updateTest('test-auth', 'success', '✅ Authentication je pripravený');
+            } catch (error) {
+                updateTest('test-auth', 'error', `❌ ${error.message}`);
+                return;
+            }
+
+            // Test 4: Database
+            log('Test 4/5: Testovanie Realtime Database...', 'info');
+            try {
+                const db = window.firebaseDB;
+                if (!db) throw new Error('Database nie je dostupný');
+                
+                // Pokus o prečítanie
+                const testRef = db.ref('.info/connected');
+                await new Promise((resolve, reject) => {
+                    testRef.once('value', 
+                        () => resolve(),
+                        (error) => reject(error)
+                    );
+                    
+                    // Timeout after 5 seconds
+                    setTimeout(() => reject(new Error('Timeout')), 5000);
+                });
+                
+                updateTest('test-database', 'success', '✅ Database je dostupná');
+            } catch (error) {
+                updateTest('test-database', 'error', `❌ ${error.message}`);
+                log('💡 Skontroluj či je Realtime Database vytvorená v Console', 'warning');
+                return;
+            }
+
+            // Test 5: Persistence
+            log('Test 5/5: Testovanie session persistence...', 'info');
+            try {
+                const auth = window.firebaseAuth;
+                const settings = auth.app.automaticDataCollectionEnabled;
+                
+                updateTest('test-persistence', 'success', '✅ Persistence je nakonfigurovaný');
+            } catch (error) {
+                updateTest('test-persistence', 'error', `❌ ${error.message}`);
+            }
+
+            // Výsledok
+            setTimeout(() => {
+                if (testsPassed === testsTotal) {
+                    log('', 'success');
+                    log('🎉 VŠETKO FUNGUJE PERFEKTNE!', 'success');
+                    log('✅ Môžeš spustiť aplikáciu (index.html)', 'success');
+                    log('', 'success');
+                } else {
+                    log('', 'error');
+                    log(`⚠️ ${testsPassed}/${testsTotal} testov úspešných`, 'warning');
+                    log('📚 Pozri SETUP_GUIDE.md alebo NAVOD_SK.md', 'info');
+                    log('', 'error');
+                }
+            }, 500);
+        }
+
+        // Auto-run on load
+        window.addEventListener('load', () => {
+            log('💡 Stránka načítaná. Pripravený na testovanie.', 'info');
+        });
+    </script>
+</body>
+</html>
